@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.fx": "hlsl",
+        "sdl.h": "c",
+        "sdl_main.h": "c",
+        "glad.h": "c"
+    }
+}

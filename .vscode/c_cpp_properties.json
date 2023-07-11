@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name" : "windowsx64",
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "C:\\Program Files\\LLVM\\bin\\clang.exe",
+            "cStandard": "c99",
+            "includePath": [
+                "C:\\Repos\\SDL2-2.28.1\\include",
+                "C:\\Repos\\cglm\\include"
+            ]
+        }
+    ],
+    "version": 4
+}
