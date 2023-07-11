@@ -22,14 +22,21 @@ int main(int argc, char* argv[])
     SDL_Window* window = lefty_initSDL();
     SDL_GLContext* context = lefty_initOpenGL(window);
 
-    //load shader code from source
-    char* basic_vert_src = loadShaderSource("shaders/basic_vert.glsl");
+    //create shader program
+    lefty_shaderProgram shaderProgram;
+    shaderProgram = createShaderProgram("basic program");
+
+    //load shader code from source, compiles the shader and links against shader program
+    char* basic_vert_src = loadShaderSource("C:\\Users\\hunter\\Desktop\\Source\\C\\lefty\\source\\shaders\\basic_vert.glsl");
+    lefty_shader basic_vert = compileVertexShader(basic_vert_src, "basic_vert");
+    attachLinkShaderProgram(shaderProgram, basic_vert.shader);
     free((void*)basic_vert_src);
 
-    char* basic_frag_src = loadShaderSource("shaders/basic_frag.glsl");
+    //load shader code from source, compiles the shader and links against shader program
+    char* basic_frag_src = loadShaderSource("C:\\Users\\hunter\\Desktop\\Source\\C\\lefty\\source\\shaders\\basic_frag.glsl");
+    lefty_shader basic_frag = compileFragmentShader(basic_frag_src, "basic_frag");
+    attachLinkShaderProgram(shaderProgram, basic_frag.shader);
     free((void*)basic_frag_src);
-
-    lefty_shader basic_vert = compileVertexShader(basic_vert_src, "basic_vert");
 
     //main game loop
     lefty_gameLoop(window);
