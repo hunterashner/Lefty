@@ -24,5 +24,6 @@ lefty_shader compileFragmentShader(const char* shaderSource, char* name);
 lefty_shaderProgram createShaderProgram(char* name);
 void attachLinkShaderProgram(lefty_shaderProgram shaderProgram, u32 shader);
 void debugShaderProgramInfo(u32 shaderProgram);
+void validateLinkStatus(u32 shaderProgram);
 
 #endif

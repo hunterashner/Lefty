@@ -22,9 +22,15 @@ void lefty_glShaderCompileLinkProgram(void)
     lefty_shaderProgram shaderProgram;
     shaderProgram = createShaderProgram("basic program");
 
-    //load shader code from source, compiles the shader and links against shader program
-    char basic_vert_path[] = "C:\\Users\\hunter\\Desktop\\Source\\C\\lefty\\source\\shaders\\basic_vert.glsl";
-    char basic_frag_path[] = "C:\\Users\\hunter\\Desktop\\Source\\C\\lefty\\source\\shaders\\basic_frag.glsl"; 
+    /* 
+    * load shader code from source, compiles the shader and links 
+    * against shader program.
+    * fopen calls are relative to where the binary is executed
+    * make sure you are in the root directory before ./build/lefty.exe
+    * or fopen will fail to find the shader paths.  
+    */
+    char basic_vert_path[] = "source\\shaders\\basic_vert.glsl";
+    char basic_frag_path[] = "source\\shaders\\basic_frag.glsl"; 
 
     //compiles the shader and links against shader program
     const char* basic_vert_src = loadShaderSource(basic_vert_path);

@@ -6,6 +6,8 @@
 #include"lefty_shader_utils.h"
 #include"lefty_defs.h"
 
+/// TODO: refactor entire function, malloc not working 
+/// null termination failing.
 /// @brief loads glsl source from filepath and stores in string
 /// buffer, fails if path or memory allocation is invalid
 /// @param filepath 
@@ -16,6 +18,7 @@ char* loadShaderSource(const char* filepath)
     if(file == NULL)
     {
         printf("failed to open file at path: %s\n", filepath);
+        perror("fopen");
         return NULL;
     }
 
@@ -27,10 +30,19 @@ char* loadShaderSource(const char* filepath)
     if(buffer == NULL)
     {
         printf("failed to allocate buffer fore file at path: %s\n", filepath);
+        perror("fopen");
         return NULL;
     }
 
-    fread(buffer, 1, filesize, file);
+    if(fread(buffer, 1, filesize, file) < filesize)
+    {
+        printf("failed to read file at path: %s\n", filepath);
+        perror("fopen");
+        fclose(file);
+        free(buffer);
+        return NULL;
+    }
+
     buffer[filesize] = '\0';
 
     fclose(file);
@@ -53,12 +65,14 @@ lefty_shader compileVertexShader(const char* shaderSource, char* name)
     glCompileShader(shader);
 
     //check if compilation was successful
-    int* status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, status);
+    i32 status;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if(status == GL_FALSE)
     {
-        printf("error during compilation of shader: %s\n", name);
-        exit(1);
+        i32 log_length = 0;
+        char message[1024];
+        glGetShaderInfoLog(shader, 1024, &log_length, message);
+        printf("failed to compile %s\n error: %s\n", name, message);
     }
 
     lefty_shader vertexShader;
@@ -143,24 +157,23 @@ void attachLinkShaderProgram(lefty_shaderProgram shaderProgram, u32 shader)
     //attach and link incoming shader to program
     glAttachShader(shaderProgram.program, shader);
     glLinkProgram(shaderProgram.program);
+    validateLinkStatus(shaderProgram.program);
 }
 
 
-/// @brief 
+/// @brief https://docs.gl/gl3/glGetShaderInfoLog
 /// @param shaderProgram 
 void debugShaderProgramInfo(u32 shaderProgram)
 {
-    i32 length;
-    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &length);
-    char* log = (char*)malloc(length * sizeof(char));
-    i32 logSize;
-    glGetShaderInfoLog(shaderProgram, length, &logSize, log);
+    i32 maxLength;
+    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
 
-    //if data is logged
-    if(logSize >= 0)
+    if(maxLength != 0) //if info log exists
     {
-        //TODO: refactor, potential buffer overflow
-        log[logSize] = '\0';
+        char* log = (char*)malloc(maxLength * sizeof(char));
+        i32* length;
+        glGetShaderInfoLog(shaderProgram, maxLength, length, log);
+        printf("%d\n", *length);
         printf("shader program error: \n%s\n", log);
         free(log);
     }
@@ -170,4 +183,8 @@ void validateLinkStatus(u32 shaderProgram)
 {
     i32 status;
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
+    if(status != GL_TRUE)
+    {
+        printf("linking of shader program %d failed", shaderProgram);
+    }
 }
