@@ -45,7 +45,7 @@ char* loadShaderSource(const char* filepath)
 /// @param shaderSource 
 /// @param name 
 /// @return lefty_shader struct
-lefty_shader compileVertexShader(char* shaderSource, char* name)
+lefty_shader compileVertexShader(const char* shaderSource, char* name)
 {
     u32 shader;
     shader = glCreateShader(GL_VERTEX_SHADER);
@@ -57,7 +57,7 @@ lefty_shader compileVertexShader(char* shaderSource, char* name)
     glGetShaderiv(shader, GL_COMPILE_STATUS, status);
     if(status == GL_FALSE)
     {
-        printf("error during compilation of shader: %s\n", *name);
+        printf("error during compilation of shader: %s\n", name);
         exit(1);
     }
 
@@ -76,7 +76,7 @@ lefty_shader compileVertexShader(char* shaderSource, char* name)
 /// @param shaderSource
 /// @param name
 /// @return lefty_shader
-lefty_shader compileFragmentShader(char* shaderSource, char* name)
+lefty_shader compileFragmentShader(const char* shaderSource, char* name)
 {
     u32 shader;
     shader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -88,7 +88,7 @@ lefty_shader compileFragmentShader(char* shaderSource, char* name)
     glGetShaderiv(shader, GL_COMPILE_STATUS, status);
     if(status == GL_FALSE)
     {
-        printf("error during compilation of shader: %s\n", *name);
+        printf("error during compilation of shader: %s\n", name);
         exit(1);
     }
 
@@ -143,4 +143,31 @@ void attachLinkShaderProgram(lefty_shaderProgram shaderProgram, u32 shader)
     //attach and link incoming shader to program
     glAttachShader(shaderProgram.program, shader);
     glLinkProgram(shaderProgram.program);
+}
+
+
+/// @brief 
+/// @param shaderProgram 
+void debugShaderProgramInfo(u32 shaderProgram)
+{
+    i32 length;
+    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &length);
+    char* log = (char*)malloc(length * sizeof(char));
+    i32 logSize;
+    glGetShaderInfoLog(shaderProgram, length, &logSize, log);
+
+    //if data is logged
+    if(logSize >= 0)
+    {
+        //TODO: refactor, potential buffer overflow
+        log[logSize] = '\0';
+        printf("shader program error: \n%s\n", log);
+        free(log);
+    }
+}
+
+void validateLinkStatus(u32 shaderProgram)
+{
+    i32 status;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
 }
